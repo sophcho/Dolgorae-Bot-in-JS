@@ -1,6 +1,6 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageActionRow, MessageButton } = require('discord.js');
+const { MessageActionRow, MessageButton, MessageSelectMenu } = require('discord.js');
 const { Permissions } = require('discord.js');
 
 module.exports = {
@@ -75,8 +75,175 @@ module.exports = {
 					.setEmoji('❤️'),
 			);
 
+		const row2 = new MessageActionRow()
+			.addComponents(
+				new MessageSelectMenu()
+					.setCustomId('league_tier')
+					.setPlaceholder('Tier')
+					.addOptions([
+						{
+							label: 'Iron',
+							value: 'iron',
+						},
+						{
+							label: 'Bronze',
+							value: 'bronze',
+						},
+						{
+							label: 'Silver',
+							value: 'silver',
+						},
+						{
+							label: 'Gold',
+							value: 'gold',
+						},
+						{
+							label: 'Platinum',
+							value: 'platinum',
+						},
+						{
+							label: 'Diamond',
+							value: 'diamond',
+						},
+						{
+							label: 'Master',
+							value: 'master',
+						},
+						{
+							label: 'Grandmaster',
+							value: 'grandmaster',
+						},
+						{
+							label: 'Challenger',
+							value: 'challenger',
+						},
+					]),
+			);
+
+		const row2v = new MessageActionRow()
+			.addComponents(
+				new MessageSelectMenu()
+					.setCustomId('valorant_tier')
+					.setPlaceholder('Tier')
+					.addOptions([
+						{
+							label: 'Iron',
+							value: 'iron',
+						},
+						{
+							label: 'Bronze',
+							value: 'bronze',
+						},
+						{
+							label: 'Silver',
+							value: 'silver',
+						},
+						{
+							label: 'Gold',
+							value: 'gold',
+						},
+						{
+							label: 'Platinum',
+							value: 'platinum',
+						},
+						{
+							label: 'Diamond',
+							value: 'diamond',
+						},
+						{
+							label: 'Immortal',
+							value: 'immortal',
+						},
+						{
+							label: 'Radiant',
+							value: 'radiant',
+						},
+					]),
+			);
+
+		const row3 = new MessageActionRow()
+			.addComponents(
+				new MessageSelectMenu()
+					.setCustomId('league_rank')
+					.setPlaceholder('Rank')
+					.addOptions([
+						{
+							label: '1',
+							value: '1',
+						},
+						{
+							label: '2',
+							value: '2',
+						},
+						{
+							label: '3',
+							value: '3',
+						},
+						{
+							label: '4',
+							value: '4',
+						},
+					]),
+			);
+
+		const row3v = new MessageActionRow()
+			.addComponents(
+				new MessageSelectMenu()
+					.setCustomId('valorant_rank')
+					.setPlaceholder('Rank')
+					.addOptions([
+						{
+							label: '1',
+							value: '1',
+						},
+						{
+							label: '2',
+							value: '2',
+						},
+						{
+							label: '3',
+							value: '3',
+						},
+					]),
+			);
+
+		const row4 = new MessageActionRow()
+			.addComponents(
+				new MessageSelectMenu()
+					.setCustomId('position')
+					.setPlaceholder('Position')
+					.addOptions([
+						{
+							label: 'TOP',
+							value: 'top',
+							emoji: '🤡',
+						},
+						{
+							label: 'JUNGLE',
+							value: 'jungle',
+							emoji: '👨‍🌾',
+						},
+						{
+							label: 'MID',
+							value: 'mid',
+							emoji: '👑',
+						},
+						{
+							label: 'ADC',
+							value: 'adc',
+							emoji: '🥄',
+						},
+						{
+							label: 'SUPPORT',
+							value: 'support',
+							emoji: '🛠️',
+						},
+					]),
+			);
+
+
 		let game_url = {};
-		if (game === '롤') {
+		if (game === '리그 오브 레전드') {
 			game_url = 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/LoL_icon.svg/256px-LoL_icon.svg.png';
 		}
 		else {
@@ -104,7 +271,14 @@ module.exports = {
 			  ],
 		};
 
-		await interaction.reply({ content: ' ', embeds: [embed], components: [row] });
+		if (game === '리그 오브 레전드') {
+			await interaction.reply({ content: ' ', embeds: [embed], components: [row2, row3, row4, row] });
+		}
+		else {
+			await interaction.reply({ content: ' ', embeds: [embed], components: [row2v, row3v, row] });
+		}
+
+
 	},
 
 };

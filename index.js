@@ -40,9 +40,9 @@ for (const file of commandFiles) {
 // When the client is ready, run this code (only once)
 client.once('ready', () => {
 	console.log('Ready!');
+	client.user.setPresence({ activities: [{ name: 'v0.1.0' }], status: 'online' });
 });
 
-client.user.setActivity('v0.1.0');
 
 client.on('messageReactionAdd', async (reaction, user) => {
 	const emoji2 = reaction.emoji;
@@ -154,6 +154,53 @@ client.on('interactionCreate', async interaction => {
 		console.error(error);
 	}
 
+
+});
+
+client.on('interactionCreate', async interaction => {
+	if (!interaction.isSelectMenu()) return;
+
+	const info = interaction.values[0];
+	const menuname = interaction.customId;
+	const userid = interaction.user.id;
+	const checkifinfoexist = 'SELECT * FROM `player_info` WHERE userid = \'' + userid + '\'';
+
+	let infoexists;
+	con.query(checkifinfoexist, function(err, result) {
+		if (err) throw err;
+		infoexists = result.length;
+	});
+
+	await wait(100);
+
+	try {
+		if (infoexists === 0) {
+			const signup = 'INSERT INTO `player_info` (userid, ' + menuname + ') VALUES (\'' + userid + '\', \'' + info + '\')';
+			con.query(signup, function(err, result) {
+				if (err) throw err;
+				console.log('1 record added');
+			});
+
+			interaction.reply({ content: '정보가 업데이트 되었습니다.', fetchReply: true, ephemeral: true })
+				.then(console.log('Updated league tier for a user'))
+				.catch(console.error);
+		}
+		else {
+			const sql = 'UPDATE `player_info` SET ' + menuname + ' = \'' + info + '\' WHERE userid = \'' + userid + '\'';
+
+			con.query(sql, function(err, result) {
+				if (err) throw err;
+				console.log('Record updated');
+			});
+
+			interaction.reply({ content: '정보가 업데이트 되었습니다.', fetchReply: true, ephemeral: true })
+				.then(console.log('Updated league tier for a user'))
+				.catch(console.error);
+		}
+	}
+	catch (error) {
+		console.error(error);
+	}
 
 });
 
