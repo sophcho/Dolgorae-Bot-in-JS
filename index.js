@@ -160,7 +160,21 @@ client.on('interactionCreate', async interaction => {
 client.on('interactionCreate', async interaction => {
 	if (!interaction.isSelectMenu()) return;
 
-	const info = interaction.values[0];
+	let info = '';
+	if (interaction.values.length > 1) {
+		for (let i = 0; i < interaction.values.length; i++) {
+			if (i === interaction.values.length - 1) {
+				info += interaction.values[i];
+			}
+			else {
+				info += interaction.values[i] + ', ';
+			}
+		}
+	}
+	else {
+		info = interaction.values[0];
+	}
+
 	const menuname = interaction.customId;
 	const userid = interaction.user.id;
 	const checkifinfoexist = 'SELECT * FROM `player_info` WHERE userid = \'' + userid + '\'';

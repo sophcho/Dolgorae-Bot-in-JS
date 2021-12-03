@@ -128,35 +128,35 @@ module.exports = {
 					.addOptions([
 						{
 							label: 'Iron',
-							value: 'iron',
+							value: 'Iron',
 						},
 						{
 							label: 'Bronze',
-							value: 'bronze',
+							value: 'Bronze',
 						},
 						{
 							label: 'Silver',
-							value: 'silver',
+							value: 'Silver',
 						},
 						{
 							label: 'Gold',
-							value: 'gold',
+							value: 'Gold',
 						},
 						{
 							label: 'Platinum',
-							value: 'platinum',
+							value: 'Platinum',
 						},
 						{
 							label: 'Diamond',
-							value: 'diamond',
+							value: 'Diamond',
 						},
 						{
 							label: 'Immortal',
-							value: 'immortal',
+							value: 'Immortal',
 						},
 						{
 							label: 'Radiant',
-							value: 'radiant',
+							value: 'Radiant',
 						},
 					]),
 			);
@@ -212,30 +212,32 @@ module.exports = {
 				new MessageSelectMenu()
 					.setCustomId('position')
 					.setPlaceholder('Position')
+					.setMinValues(1)
+					.setMaxValues(5)
 					.addOptions([
 						{
 							label: 'TOP',
-							value: 'top',
+							value: 'Top',
 							emoji: '🤡',
 						},
 						{
 							label: 'JUNGLE',
-							value: 'jungle',
+							value: 'Jungle',
 							emoji: '👨‍🌾',
 						},
 						{
 							label: 'MID',
-							value: 'mid',
+							value: 'Mid',
 							emoji: '👑',
 						},
 						{
 							label: 'ADC',
-							value: 'adc',
+							value: 'Adc',
 							emoji: '🥄',
 						},
 						{
 							label: 'SUPPORT',
-							value: 'support',
+							value: 'Support',
 							emoji: '🛠️',
 						},
 					]),
