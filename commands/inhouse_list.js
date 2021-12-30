@@ -1,6 +1,5 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const wait = require('util').promisify(setTimeout);
-
+const { promisify } = require('util');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -26,56 +25,39 @@ module.exports = {
 
 		const logger = log4js.getLogger('log');
 
+		let connection = await promisify(pool.getConnection).bind(pool)();
+		let result = await promisify(connection.query(sql)).bind(connection)();
+
 		var msg = 'There is no one in the list yet!';
-		pool.getConnection(function (err, connection) {
 
-			if (err) {
-				logger.error(err);
-				throw err;
+		let userid;
+		
+		for (let i = 0; i < result.length; i++) {
+			if (i === 0) {
+				msg = '';
 			}
+			
+			userid = result[i]['userid'];
+			userid = userid.toString();
+			let member = await interaction.guild.members.fetch({ user: userid, force: false });
+			console.log(member);
+			
+			msg += (i + 1) + ': ' + member.user.username + '#' + member.user.discriminator;
+			if (gameselected === '리그 오브 레전드') {
+				msg += '``[' + result[i]['league_tier'] + ' ' + result[i]['league_rank'] + ' ' + result[0]['position'] + ']``\n';
+			}
+			else if (gameselected === '발로란트') {
+				msg += '``[' + result[i]['valorant_tier'] + ' ' + result[i]['valorant_rank'] + ']``\n';
+			}
+			else {
+				msg += '\n';
+			}
+		}
 
-			connection.query(sql, function (err, result) {
-				if (err) {
-					logger.error(err);
-					throw err;
-				}
-				let userid;
-				
-				for (let i = 0; i < result.length; i++) {
-					if (i === 0) {
-						msg = '';
-					}
-					
-					userid = result[i]['userid'];
-					userid = userid.toString();
-					let member = interaction.guild.members.fetch({ user: userid, force: false });
-					console.log(member);
-					
-					msg += (i + 1) + ': ' + member.user.username + '#' + member.user.discriminator;
-					if (gameselected === '리그 오브 레전드') {
-						msg += '``[' + result[i]['league_tier'] + ' ' + result[i]['league_rank'] + ' ' + result[0]['position'] + ']``\n';
-					}
-					else if (gameselected === '발로란트') {
-						msg += '``[' + result[i]['valorant_tier'] + ' ' + result[i]['valorant_rank'] + ']``\n';
-					}
-					else {
-						msg += '\n';
-					}
-				}
-
-				connection.release();
-				if (err) {
-					logger.error(err);
-					throw err;
-				}
-
-				interaction.reply({ content: msg, ephemeral: true });
-			});
+		interaction.reply({ content: msg, ephemeral: true });
 
 
-			logger.info(interaction.user.tag + ' generated the list for ' + interaction.guild.name + '.');
-
-		});
+		logger.info(interaction.user.tag + ' generated the list for ' + interaction.guild.name + '.');
 
 
 
