@@ -5,20 +5,21 @@ const mysql = require('mysql');
 const fs = require('fs');
 const { Collection } = require('discord.js');
 const wait = require('util').promisify(setTimeout);
+
 const log4js = require('log4js');
 log4js.configure({
 	appenders: { log: { type: 'file', filename: 'debug.log' } },
 	categories: { default: { appenders: ['log'], level: 'all' } },
 });
-
 const logger = log4js.getLogger('log');
+
+
 const pool = mysql.createPool({
 	host: config.dbhost,
 	user: config.dbuser,
 	password: config.dbpw,
 	database: config.dbname,
 });
-
 module.exports = { pool };
 
 // Create a new client instance
@@ -38,76 +39,75 @@ for (const file of commandFiles) {
 // When the client is ready, run this code (only once)
 client.once('ready', () => {
 	console.log('Ready, setting presence');
-	logger.info('Ready, sett₩ing presence');
+	logger.info('Ready, setting presence');
 	client.user.setPresence({ activities: [{ name: 'v0.2.1' }], status: 'online' });
 });
 
+// client.on('messageReactionAdd', async (reaction, user) => {
+// 	const emoji2 = reaction.emoji;
+// 	// if (user === reaction.message.author) {
+// 	// 	return;
+// 	// }
+// 	if (reaction.message.channelId === '914152751083167804') {
+// 		if (emoji2.name == '✅') {
+// 			await reaction.message.author.send(user.username + ' reacted!');
+// 			const userid = user.id;
+// 			const username = user.username;
+// 			const sql = 'INSERT INTO `inhouse_list` (userid, number, username) VALUES (' + userid + ', NULL, \'' + username + '\')';
+// 			pool.getConnection(function(err, connection) {
+// 				if (err) throw err;
 
-client.on('messageReactionAdd', async (reaction, user) => {
-	const emoji2 = reaction.emoji;
-	// if (user === reaction.message.author) {
-	// 	return;
-	// }
-	if (reaction.message.channelId === '914152751083167804') {
-		if (emoji2.name == '✅') {
-			await reaction.message.author.send(user.username + ' reacted!');
-			const userid = user.id;
-			const username = user.username;
-			const sql = 'INSERT INTO `inhouse_list` (userid, number, username) VALUES (' + userid + ', NULL, \'' + username + '\')';
-			pool.getConnection(function(err, connection) {
-				if (err) throw err;
+// 				try {
+// 					connection.query(sql, function(err, result) {
+// 						if (err) throw err;
+// 						console.log('1 record added');
+// 						connection.release();
+// 						if (err) throw err;
+// 					});
+// 				}
+// 				catch (error) {
+// 					console.error(error);
+// 				}
 
-				try {
-					connection.query(sql, function(err, result) {
-						if (err) throw err;
-						console.log('1 record added');
-						connection.release();
-						if (err) throw err;
-					});
-				}
-				catch (error) {
-					console.error(error);
-				}
+// 			});
 
-			});
-
-		}
+// 		}
 
 
-	}
-});
+// 	}
+// });
 
-client.on('messageReactionRemove', async (reaction, user) => {
-	const emoji2 = reaction.emoji;
-	// if (user === reaction.message.author) {
-	// 	return;
-	// }
-	if (reaction.message.channelId === '914152751083167804') {
-		if (emoji2.name == '✅') {
-			await reaction.message.author.send(user.username + ' deleted reaction!');
-			const userid = user.id;
-			const sql = 'DELETE FROM `inhouse_list` WHERE userid = \'' + userid + '\'';
+// client.on('messageReactionRemove', async (reaction, user) => {
+// 	const emoji2 = reaction.emoji;
+// 	// if (user === reaction.message.author) {
+// 	// 	return;
+// 	// }
+// 	if (reaction.message.channelId === '914152751083167804') {
+// 		if (emoji2.name == '✅') {
+// 			await reaction.message.author.send(user.username + ' deleted reaction!');
+// 			const userid = user.id;
+// 			const sql = 'DELETE FROM `inhouse_list` WHERE userid = \'' + userid + '\'';
 
-			pool.getConnection(function(err, connection) {
-				if (err) throw err;
+// 			pool.getConnection(function(err, connection) {
+// 				if (err) throw err;
 
-				try {
-					connection.query(sql, function(err, result) {
-						if (err) throw err;
-						console.log('Number of records deleted: ' + result.affectedRows);
-						connection.release();
-						if (err) throw err;
-					});
-				}
-				catch (error) {
-					console.error(error);
-				}
+// 				try {
+// 					connection.query(sql, function(err, result) {
+// 						if (err) throw err;
+// 						console.log('Number of records deleted: ' + result.affectedRows);
+// 						connection.release();
+// 						if (err) throw err;
+// 					});
+// 				}
+// 				catch (error) {
+// 					console.error(error);
+// 				}
 
-			});
+// 			});
 
-		}
-	}
-});
+// 		}
+// 	}
+// });
 
 client.on('interactionCreate', async interaction => {
 	if (!interaction.isCommand()) return;
@@ -207,6 +207,7 @@ client.on('interactionCreate', async interaction => {
 			}
 		}
 		catch (error) {
+			console.log(error);
 			logger.error(error);
 		}
 

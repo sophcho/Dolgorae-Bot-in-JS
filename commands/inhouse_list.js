@@ -20,13 +20,13 @@ module.exports = {
 		const gameselected = interaction.options.getString('게임');
 		const sql = `SELECT * FROM inhouse_list JOIN player_info ON inhouse_list.userid = player_info.userid WHERE inhouse_list.server = ${serverid} ORDER BY inhouse_list.number ASC`;
 		const { pool } = require('../index.js');
-		const log4js = require('log4js');
-		log4js.configure({
-			appenders: { log: { type: 'file', filename: 'debug.log' } },
-			categories: { default: { appenders: ['log'], level: 'all' } },
-		});
+		// const log4js = require('log4js');
+		// log4js.configure({
+		// 	appenders: { log: { type: 'file', filename: 'debug.log' } },
+		// 	categories: { default: { appenders: ['log'], level: 'all' } },
+		// });
 
-		const logger = log4js.getLogger('log');
+		// const logger = log4js.getLogger('log');
 
 		const connection = await promisify(pool.getConnection).bind(pool)();
 		const result = await promisify(connection.query).bind(connection)(sql);
@@ -34,7 +34,7 @@ module.exports = {
 		let msg = 'There is no one in the list yet!';
 
 		let userid;
-
+		
 		for (let i = 0; i < result.length; i++) {
 			if (i === 0) {
 				msg = '';
@@ -47,6 +47,7 @@ module.exports = {
 					user: userid,
 					force: false,
 				});
+				
 				msg += `${i + 1} : ${member.displayName} (${member.user.tag})`;
 				if (gameselected === '리그 오브 레전드') {
 					msg += `\`\`\[${result[i]['league_tier']} ${result[i]['league_rank']} ${result[0]['position']}\]\`\`\n`;
@@ -59,18 +60,19 @@ module.exports = {
 				}
 			}
 			catch (err) {
-				logger.error(err);
+				console.log(err);
+				//logger.error(err);
 				msg += `${i + 1}: Unknown User (No longer in the server)\n`;
 			}
 		}
 
 		await interaction.reply({ content: msg, ephemeral: true });
-
-		logger.info(
-			interaction.user.tag +
-        ' generated the list for ' +
-        interaction.guild.name +
-        '.',
-		);
+	
+		// logger.info(
+		// 	interaction.user.tag +
+        // ' generated the list for ' +
+        // interaction.guild.name +
+        // '.',
+		// );
 	},
 };
