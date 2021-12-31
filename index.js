@@ -1,6 +1,6 @@
 // Require the necessary discord.js classes
 const Discord = require('discord.js');
-const { token } = require('./config.json');
+const config = require('./config.json');
 const mysql = require('mysql');
 const fs = require('fs');
 const { Collection } = require('discord.js');
@@ -13,10 +13,10 @@ log4js.configure({
 
 const logger = log4js.getLogger('log');
 const pool = mysql.createPool({
-	host: 'na05-sql.pebblehost.com',
-	user: 'customer_234512_dolgoraebot',
-	password: '6!GxA7D6P09vmDLBTeqr',
-	database: 'customer_234512_dolgoraebot',
+	host: config.dbhost,
+	user: config.dbuser,
+	password: config.dbpw,
+	database: config.dbname,
 });
 
 module.exports = { pool };
@@ -322,4 +322,4 @@ client.on('interactionCreate', async interaction => {
 });
 
 // Login to Discord with your client's token
-client.login(token);
+client.login(config.token);

@@ -19,15 +19,20 @@ module.exports = {
 		const serverid = interaction.guildId;
 		const maxcount = interaction.options.getInteger('플레이어_수');
 		let list_count;
-		const { con } = require('../index.js');
+		const { pool } = require('../index.js');
 
 		const list_count_sql = 'SELECT COUNT (*) FROM `inhouse_list` WHERE server = ' + serverid;
 
-		con.query(list_count_sql, function(err, result) {
+		pool.getConnection(function(err, connection) {
 			if (err) throw err;
-			console.log(result);
-			list_count = result;
+			connection.query(list_count_sql, function(err, result) {
+				console.log(result);
+				list_count = result;
+				connection.release();
+				if (err) throw err;
+			});
 		});
+
 		await wait(200);
 
 		if (list_count[0]['COUNT (*)'] < maxcount) {
@@ -41,11 +46,16 @@ module.exports = {
 
 		try {
 			let qryresult;
-			con.query(sql, function(err, result) {
+			pool.getConnection(function(err, connection) {
 				if (err) throw err;
-				console.log(result);
-				qryresult = result;
+				connection.query(sql, function(err, result) {
+					console.log(result);
+					qryresult = result;
+					connection.release();
+					if (err) throw err;
+				});
 			});
+
 			await wait(400);
 
 			let msg = '🔔참가인원 ' + maxcount + '명은: ';
@@ -91,5 +101,6 @@ module.exports = {
 		catch (error) {
 			console.error(error);
 		}
+
 	},
 };
