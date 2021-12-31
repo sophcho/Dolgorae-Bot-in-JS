@@ -3,6 +3,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageActionRow, MessageButton, MessageSelectMenu } = require('discord.js');
 const { Permissions } = require('discord.js');
 
+
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('내전')
@@ -44,19 +45,41 @@ module.exports = {
 			await interaction.reply({ content: '내전 커맨드를 사용할 권한이 없습니다.', ephemeral: true });
 			return;
 		}
+		const log4js = require('log4js');
+		log4js.configure({
+			appenders: { log: { type: 'file', filename: 'debug.log' } },
+			categories: { default: { appenders: ['log'], level: 'all' } },
+		});
+
+		const logger = log4js.getLogger('log');
 
 		const guildid = interaction.guildId;
 		const sql = 'DELETE FROM `inhouse_list` WHERE server = \'' + guildid + '\'';
-		const { con } = require('../index.js');
+		const { pool } = require('../index.js');
+
 		try {
-			con.query(sql, function(err, result) {
-				if (err) throw err;
-				console.log('Number of records deleted: ' + result.affectedRows);
+			pool.getConnection(function(err, connection) {
+				if (err) {
+					logger.error(err);
+					throw err;
+				}
+				connection.query(sql, function(err, result) {
+					if (err) {
+						logger.error(err);
+						throw err;
+					}
+					connection.release();
+					if (err) {
+						logger.error(err);
+						throw err;
+					}
+				});
 			});
 		}
 		catch (error) {
-			console.error(error);
+			logger.error(error);
 		}
+
 
 		const game = interaction.options.getString('게임');
 		const date = interaction.options.getString('날짜');
@@ -128,35 +151,35 @@ module.exports = {
 					.addOptions([
 						{
 							label: 'Iron',
-							value: 'iron',
+							value: 'Iron',
 						},
 						{
 							label: 'Bronze',
-							value: 'bronze',
+							value: 'Bronze',
 						},
 						{
 							label: 'Silver',
-							value: 'silver',
+							value: 'Silver',
 						},
 						{
 							label: 'Gold',
-							value: 'gold',
+							value: 'Gold',
 						},
 						{
 							label: 'Platinum',
-							value: 'platinum',
+							value: 'Platinum',
 						},
 						{
 							label: 'Diamond',
-							value: 'diamond',
+							value: 'Diamond',
 						},
 						{
 							label: 'Immortal',
-							value: 'immortal',
+							value: 'Immortal',
 						},
 						{
 							label: 'Radiant',
-							value: 'radiant',
+							value: 'Radiant',
 						},
 					]),
 			);
@@ -212,30 +235,32 @@ module.exports = {
 				new MessageSelectMenu()
 					.setCustomId('position')
 					.setPlaceholder('Position')
+					.setMinValues(1)
+					.setMaxValues(5)
 					.addOptions([
 						{
 							label: 'TOP',
-							value: 'top',
+							value: 'Top',
 							emoji: '🤡',
 						},
 						{
 							label: 'JUNGLE',
-							value: 'jungle',
+							value: 'Jungle',
 							emoji: '👨‍🌾',
 						},
 						{
 							label: 'MID',
-							value: 'mid',
+							value: 'Mid',
 							emoji: '👑',
 						},
 						{
 							label: 'ADC',
-							value: 'adc',
+							value: 'Adc',
 							emoji: '🥄',
 						},
 						{
 							label: 'SUPPORT',
-							value: 'support',
+							value: 'Support',
 							emoji: '🛠️',
 						},
 					]),
@@ -270,6 +295,8 @@ module.exports = {
 				},
 			  ],
 		};
+
+		logger.info('Inhouse was created at ' + interaction.guild.name + ' by ' + interaction.user.tag + '.');
 
 		if (game === '리그 오브 레전드') {
 			await interaction.reply({ content: ' ', embeds: [embed], components: [row2, row3, row4, row] });
