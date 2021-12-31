@@ -1,22 +1,19 @@
 {
-  "name": "dolgoratebot",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "sophie cho",
-  "license": "ISC",
-  "dependencies": {
-    "@discordjs/builders": "^0.8.2",
-    "@discordjs/rest": "^0.1.0-canary.0",
-    "collections": "^5.1.12",
-    "discord-api-types": "^0.25.2",
-    "discord.js": "^13.3.1",
-    "mysql": "^2.18.1"
-  },
-  "devDependencies": {
-    "eslint": "^8.3.0"
-  }
+    "name": "multi-loader",
+    "version": "1.0.0",
+    "description": "",
+    "main": "loader.js",
+    "scripts": [],
+    "author": "Jay Williams",
+    "license": "ISC",
+    "dependencies": {
+        "@discordjs/builders": "^0.9.0",
+        "@discordjs/rest": "^0.1.1-canary.0",
+        "discord-api-types": "^0.26.0-next.c7efcd5.1638534656",
+        "discord.js": "^13.4.0",
+        "log4js": "^6.3.0",
+        "mysql": "^2.18.1",
+        "mysql-async-simple": "^1.0.3"
+    },
+    "nodeVersion": "16.11.1"
 }
