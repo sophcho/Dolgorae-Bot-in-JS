@@ -5,7 +5,7 @@ const { Permissions } = require('discord.js');
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('내전_참가자_뽑기')
-		.setDescription('내전에 참가 할 사람들을 리스트순으로 뽑고 나머지 ')
+		.setDescription('내전에 참가 할 사람들을 리스트순으로 뽑고 나머지 사람들은 대기자 명단에 추가됩니다.')
 		.addIntegerOption(option =>
 			option.setName('플레이어_수')
 				.setDescription('숫자로만 적어주세요.')

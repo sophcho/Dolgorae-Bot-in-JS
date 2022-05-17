@@ -33,4 +33,4 @@ function runfile(name) {
 
 for (const f of start_files) {
 	runfile(f).then(() => console.log(`[Loader]File ${f} stopped`));
-}
+} 
