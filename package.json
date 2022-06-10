@@ -11,11 +11,14 @@
         "@discordjs/rest": "^0.1.1-canary.0",
         "discord-api-types": "^0.26.1",
         "discord.js": "^13.4.0",
+        "discordjs-button-pagination": "^3.0.1",
         "kayn": "^0.10.2",
         "log4js": "^6.3.0",
         "mysql": "^2.18.1",
         "mysql-async-simple": "^1.0.3",
-        "mysql2": "^2.3.3"
+        "mysql2": "^2.3.3",
+        "teemojs": "^1.8.0",
+        "twisted": "^1.46.8"
     },
     "nodeVersion": "16.11.1"
 }

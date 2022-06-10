@@ -132,7 +132,7 @@ client.on('interactionCreate', async interaction => {
 				await interaction.editReply({ content: 'There\'s no summoner with that name! :pleading_face:' , ephemeral: true });
 			}
 			else{
-				await interaction.editReply({ content: 'There was an error while executing this command!', ephemeral: true });
+				await interaction.editReply({ content: 'There was an error while executing this command! (They could be unranked!)', ephemeral: true });
 			}
 		}
 		else{	

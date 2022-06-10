@@ -1,8 +1,9 @@
+const paginationEmbed = require('discordjs-button-pagination');
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageActionRow, MessageButton, MessageSelectMenu } = require('discord.js');
+const { MessageActionRow, MessageButton} = require('discord.js');
 const log4js = require('log4js');
 const logger = log4js.getLogger('log');
-const { riotAPI, leagueVersion } = require('../config.json');
+const { riotAPI, leagueVersion } = require('../../config.json');
 const { Kayn, REGIONS, KaynRequest } = require('kayn');
 const kayn = Kayn(riotAPI)({
     region: REGIONS.NORTH_AMERICA,
@@ -31,7 +32,7 @@ const kayn = Kayn(riotAPI)({
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('search')
+        .setName('recentmatches')
         .addStringOption((option) =>
             option
                 .setName('summoner_name')
@@ -41,32 +42,38 @@ module.exports = {
         .addStringOption((option) =>
             option
                 .setName('queue_type')
-                .setDescription('Select queue type')
-                .setRequired(true)
-                .addChoice('solo', 'Solo Queue')
-                .addChoice('flex', 'Flex Queue'),
+                .setDescription('Select queue type (Default is solo queue)')
+                .setRequired(false)
+                .addChoice('solo', 'solo')
+                .addChoice('flex', 'flex')
+                .addChoice('all', 'all'),
         )
-        .setDescription('asdfasdf',),
+        .setDescription('Looks up the recent 5 matches of the summoner',),
 
     async execute(interaction)
     {
         await interaction.reply({ content: 'Fetching summoner information...',  ephemeral: false });
         const name = interaction.options.getString('summoner_name');
-        // need to call (summonername)summonerv4 (ids, profileicon, level) -> (summonerid)leaguev4 (stats)
-
-        // Unique: rank, wins + losses, winrate (check choice)
+        const queueType = interaction.options.getString('queue_type');
 
         async function embed()
         {
 
             const summonerv4 = await kayn.Summoner.by.name(name);
     
-            let level = summonerv4.summonerLevel;
             let iconURL = 'http://ddragon.leagueoflegends.com/cdn/' + leagueVersion + '/img/profileicon/' + summonerv4.profileIconId + '.png';
             let opggURL = 'https://na.op.gg/summoners/na/' + summonerv4.name.replace(/ /g,'');
 
-            const leaguev4 = await kayn.League.Entries.by.summonerID(summonerv4.id);
-            console.log(leaguev4)
+            const matchConfig = {
+                name: summonerv4.name,
+                options: {
+                  queue: 420,
+                  count: 5
+                }
+              }
+
+            const matchv5 = await kayn.Matchlist.by.puuid(matchConfig);
+            console.log(matchv5)
             let queue_type, color;
             console.log(interaction.options.getString('queue_type'));
             if (interaction.options.getString('queue_type') === "Solo Queue"){
@@ -105,7 +112,7 @@ module.exports = {
                 {
                 "title": summonerv4.name,
                 "description": ':trophy: ' + interaction.options.getString('queue_type'),
-                 "color": color,
+                "color": color,
                 "fields": [
                     {
                         "name": `Rank`,
@@ -154,3 +161,47 @@ module.exports = {
     },
 };
 
+
+
+
+
+
+
+// const { MessageEmbed , MessageButton} = require('discord.js');
+// const embed1 = new MessageEmbed()
+//                 .setTitle('First Page')
+//                 .setDescription('This is the first page');
+
+// const embed2 = new MessageEmbed()
+//                 .setTitle('Second Page')
+//                 .setDescription('This is the second page');
+
+// const button1 = new MessageButton()
+//                 .setCustomId('previousbtn')
+//                 .setLabel('Previous')
+//                 .setStyle('DANGER');
+
+// const button2 = new MessageButton()
+//                 .setCustomId('nextbtn')
+//                 .setLabel('Next')
+//                 .setStyle('SUCCESS');
+
+// // Create an array of embeds
+// pages = [
+// 	embed1,
+// 	embed2,
+// 	//....
+// 	//embedN
+// ];
+
+// //create an array of buttons
+
+// buttonList = [
+//     button1,
+//     button2
+// ]
+
+
+// // Call the paginationEmbed method, first three arguments are required
+// // timeout is the time till the reaction collectors are active, after this you can't change pages (in ms), defaults to 120000
+// paginationEmbed(interaction, pages, buttonList, timeout);

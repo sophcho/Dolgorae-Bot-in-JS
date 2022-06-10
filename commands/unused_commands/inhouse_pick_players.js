@@ -19,7 +19,7 @@ module.exports = {
 		const serverid = interaction.guildId;
 		const maxcount = interaction.options.getInteger('플레이어_수');
 		let list_count;
-		const { pool } = require('../index.js');
+		const { pool } = require('../../index.js');
 
 		const list_count_sql = 'SELECT COUNT (*) FROM `inhouse_list` WHERE server = ' + serverid;
 
