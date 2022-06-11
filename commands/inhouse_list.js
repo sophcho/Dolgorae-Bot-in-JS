@@ -20,12 +20,13 @@ module.exports = {
 		async function main() {
 			const serverid = interaction.guildId;
 			const gameselected = interaction.options.getString('게임');
-	
 			const { pool } = require('../index.js');
+
 
 
 			let msg = 'There is no one in the list yet!';
 			let userid;
+
 
 			const promisePool = pool.promise();
 			const sql = `SELECT * FROM inhouse_list JOIN player_info ON inhouse_list.userid = player_info.userid WHERE inhouse_list.server = ${serverid} ORDER BY inhouse_list.number ASC`;
@@ -35,6 +36,7 @@ module.exports = {
 			for (let i = 0; i < rows.length; i++) {
 				if (i === 0) {
 					msg = '';
+
 				}
 	
 				userid = rows[i]['userid'];
@@ -68,5 +70,6 @@ module.exports = {
 		logger.info(
 			interaction.user.tag + ' generated the list for ' + interaction.guild.name + '.',
 		);
+
 	},
 };

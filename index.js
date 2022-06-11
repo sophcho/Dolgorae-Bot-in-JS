@@ -5,13 +5,15 @@ const mysql = require('mysql2');
 const fs = require('fs');
 const { Collection } = require('discord.js');
 const wait = require('util').promisify(setTimeout);
+
 const log4js = require('log4js');
 log4js.configure({
 	appenders: { log: { type: 'file', filename: 'debug.log' } },
 	categories: { default: { appenders: ['log'], level: 'all' } },
 });
-
 const logger = log4js.getLogger('log');
+
+
 const pool = mysql.createPool({
 	host: config.dbhost,
 	user: config.dbuser,
@@ -22,7 +24,9 @@ const pool = mysql.createPool({
 	queueLimit: 0
 });
 
+
 module.exports = { pool, config };
+
 
 // Create a new client instance
 const intents = new Discord.Intents(32767);
@@ -38,13 +42,13 @@ for (const file of commandFiles) {
 
 client.once('ready', () => {
 	console.log('Ready, setting presence');
-	logger.info('Ready, sett₩ing presence');
+	logger.info('Ready, setting presence');
 	client.user.setPresence({ activities: [{ name: 'v0.2.1' }], status: 'online' });
 });
 
 
-// deprecated
 
+// deprecated
 
 // client.on('messageReactionAdd', async (reaction, user) => {
 // 	const emoji2 = reaction.emoji;
@@ -114,8 +118,6 @@ client.once('ready', () => {
 
 
 // Executing slash commands
-
-
 client.on('interactionCreate', async interaction => {
 	if (!interaction.isCommand()) return;
 
