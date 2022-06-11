@@ -109,27 +109,27 @@ module.exports = {
                 "fields": [
                     {
                         "name": `Rank`,
-                        "value": tier + ' ' + rank + ' ' + leaguePoints + 'LP',
-                        "inline": true
+                        "value": '```css\n[' + tier + ' ' + rank + ' ' + leaguePoints + 'LP' + "]```",
+                        
                     },
                     {
                         "name": `Level`,
-                        "value": level.toString(),
+                        "value": "```fix\n" + level.toString() + "```",
                         "inline": false
                     },
                     {
                         "name": `Wins`,
-                        "value": wins.toString(),
+                        "value": "```cs\n" +wins.toString()+ "```",
                         "inline": true
                     },
                     {
                         "name": `Losses`,
-                        "value": losses.toString(),
+                        "value": "```cs\n" +losses.toString()+ "```",
                         "inline": true
                     },
                     {
                         "name": `Winrate`,
-                        "value": winrate + "%",
+                        "value": "```css\n" +winrate + "%"+ "```",
                         "inline": true
                     }
                 ],
