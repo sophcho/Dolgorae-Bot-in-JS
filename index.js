@@ -1,7 +1,7 @@
 // Require the necessary discord.js classes
 const Discord = require('discord.js');
 const config = require('./config.json');
-const mysql = require('mysql');
+const mysql = require('mysql2');
 const fs = require('fs');
 const { Collection } = require('discord.js');
 const wait = require('util').promisify(setTimeout);
@@ -19,8 +19,14 @@ const pool = mysql.createPool({
 	user: config.dbuser,
 	password: config.dbpw,
 	database: config.dbname,
+	waitForConnections: true,
+	connectionLimit: 10,
+	queueLimit: 0
 });
-module.exports = { pool };
+
+
+module.exports = { pool, config };
+
 
 // Create a new client instance
 const intents = new Discord.Intents(32767);
@@ -31,17 +37,18 @@ const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('
 
 for (const file of commandFiles) {
 	const command = require(`./commands/${file}`);
-	// Set a new item in the Collection
-	// With the key as the command name and the value as the exported module
 	client.commands.set(command.data.name, command);
 }
 
-// When the client is ready, run this code (only once)
 client.once('ready', () => {
 	console.log('Ready, setting presence');
 	logger.info('Ready, setting presence');
 	client.user.setPresence({ activities: [{ name: 'v0.2.1' }], status: 'online' });
 });
+
+
+
+// deprecated
 
 // client.on('messageReactionAdd', async (reaction, user) => {
 // 	const emoji2 = reaction.emoji;
@@ -109,6 +116,8 @@ client.once('ready', () => {
 // 	}
 // });
 
+
+// Executing slash commands
 client.on('interactionCreate', async interaction => {
 	if (!interaction.isCommand()) return;
 
@@ -120,10 +129,22 @@ client.on('interactionCreate', async interaction => {
 	}
 	catch (error) {
 		logger.error(error);
-		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+		if (interaction.replied){
+			if (error.statusCode == 404){
+				await interaction.editReply({ content: 'There\'s no summoner with that name! :pleading_face:' , ephemeral: true });
+			}
+			else{
+				await interaction.editReply({ content: 'There was an error while executing this command! (They could be unranked!)', ephemeral: true });
+			}
+		}
+		else{	
+			await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+		}
+		
 	}
 });
 
+// Signing up for inhouse
 client.on('interactionCreate', async interaction => {
 	if (!interaction.isButton()) return;
 
@@ -136,63 +157,17 @@ client.on('interactionCreate', async interaction => {
 	const checkifsignedup = 'SELECT * FROM `inhouse_list` WHERE userid = \'' + userid + '\' AND server = \'' + guildId + '\'';
 	let signedup;
 
-	pool.getConnection(function(err, connection) {
+
+	pool.query(checkifsignedup, function(err, rows, fields){
 		if (err) {
 			logger.error(err);
 			throw err;
 		}
-		connection.query(checkifsignedup, function(err, result) {
-			if (err) {
-				logger.error(err);
-				throw err;
-			}
-			signedup = result.length;
-			connection.release();
-			if (err) {
-				logger.error(err);
-				throw err;
-			}
-		});
-	});
 
-
-	await wait(100);
-
-	pool.getConnection(function(err, connection) {
-		if (err) {
-			logger.error(err);
-			throw err;
-		}
-		try {
-			if (signedup === 0) {
-				const signup = 'INSERT INTO `inhouse_list` (userid, number, server) VALUES (' + userid + ', NULL, \'' + guildId + '\')';
-				connection.query(signup, function(err, result) {
-					if (err) {
-						logger.error(err);
-						throw err;
-					}
-					connection.release();
-					if (err) {
-						logger.error(err);
-						throw err;
-					}
-					else {
-						interaction.reply({ content: '내전 신청 완료!', fetchReply: true, ephemeral: true })
-							.then(logger.info(member.tag + ' signed up for inhouse at ' + guild.name))
-							.catch(logger.error);
-					}
-				});
-
-			}
-			else {
+		try{
+			if (rows.length > 0){
 				const sql = 'DELETE FROM `inhouse_list` WHERE userid = \'' + userid + '\' AND server = \'' + guildId + '\'';
-
-				connection.query(sql, function(err, result) {
-					if (err) {
-						logger.error(err);
-						throw err;
-					}
-					connection.release();
+				pool.query(sql, function(error, result){
 					if (err) {
 						logger.error(err);
 						throw err;
@@ -203,21 +178,36 @@ client.on('interactionCreate', async interaction => {
 							.catch(logger.error);
 					}
 				});
-
+			}
+			else{
+				const signup = 'INSERT INTO `inhouse_list` (userid, number, server) VALUES (' + userid + ', NULL, \'' + guildId + '\')';
+				pool.query(signup, function(error, result){
+					if (err) {
+						logger.error(err);
+						throw err;
+					}
+					else {
+						interaction.reply({ content: '내전 신청 완료!', fetchReply: true, ephemeral: true })
+							.then(logger.info(member.tag + ' signed up for inhouse at ' + guild.name))
+							.catch(logger.error);
+					}
+				});
 			}
 		}
-		catch (error) {
-			console.log(error);
+		catch(error) {
 			logger.error(error);
 		}
-
 	});
 
 });
 
+// Reacting to select menu interaction
 client.on('interactionCreate', async interaction => {
+
+	// Return if not a select menu interaction
 	if (!interaction.isSelectMenu()) return;
 
+	// Turning interaction values into a single string
 	let info = '';
 	if (interaction.values.length > 1) {
 		for (let i = 0; i < interaction.values.length; i++) {
@@ -237,67 +227,19 @@ client.on('interactionCreate', async interaction => {
 	const userid = interaction.user.id;
 	const member = await interaction.guild.members.fetch(userid)
 		.catch(logger.error);
-	const checkifinfoexist = 'SELECT * FROM `player_info` WHERE userid = \'' + userid + '\'';
-	let infoexists;
-
-	pool.getConnection(function(err, connection) {
+	let checkifinfoexist = 'SELECT * FROM `player_info` WHERE userid = \'' + userid + '\'';
+	
+	pool.query(checkifinfoexist, function(err, rows, fields){
 		if (err) {
 			logger.error(err);
 			throw err;
 		}
-		connection.query(checkifinfoexist, function(err, result) {
-			if (err) {
-				logger.error(err);
-				throw err;
-			}
-			infoexists = result.length;
-			connection.release();
-			if (err) {
-				logger.error(err);
-				throw err;
-			}
-		});
-	});
-
-	await wait(100);
-
-	try {
-		if (infoexists === 0) {
-			const signup = 'INSERT INTO `player_info` (userid, ' + menuname + ') VALUES (\'' + userid + '\', \'' + info + '\')';
-
-			pool.getConnection(function(err, connection) {
-				if (err) {
-					logger.error(err);
-					throw err;
-				}
-				connection.query(signup, function(err, result) {
-					if (err) {
-						logger.error(err);
-						throw err;
-					}
-
-					interaction.reply({ content: '정보가 업데이트 되었습니다.', fetchReply: true, ephemeral: true })
-						.then(logger.info('Updated player info for ' + member.tag))
-						.catch(logger.error);
-					connection.release();
-
-					if (err) {
-						logger.error(err);
-						throw err;
-					}
-				});
-			});
-		}
-
-		else {
-
-			pool.getConnection(function(err, connection) {
-				if (err) {
-					logger.error(err);
-					throw err;
-				}
+		
+		if (rows.length > 0){
+			console.log(userid);
 				const sql = 'UPDATE `player_info` SET ' + menuname + ' = \'' + info + '\' WHERE userid = \'' + userid + '\'';
-				connection.query(sql, function(err, result) {
+				pool.query(sql, function(err, result) {
+
 					if (err) {
 						logger.error(err);
 						throw err;
@@ -305,22 +247,29 @@ client.on('interactionCreate', async interaction => {
 					interaction.reply({ content: '정보가 업데이트 되었습니다.', fetchReply: true, ephemeral: true })
 						.then(console.log('Updated player info for ' + member.tag))
 						.catch(console.error);
-					connection.release();
-					if (err) {
-						logger.error(err);
-						throw err;
-					}
+					
 				});
-			});
 		}
+		else{
+			const signup = 'INSERT INTO `player_info` (userid, ' + menuname + ') VALUES (\'' + userid + '\', \'' + info + '\')';
+
+			pool.query(signup, function(err, result) {
+				if (err) {
+					logger.error(err);
+					throw err;
+				}
+
+				interaction.reply({ content: '정보가 업데이트 되었습니다.', fetchReply: true, ephemeral: true })
+						.then(logger.info('Updated player info for ' + member.tag))
+						.catch(logger.error);
+
+				});
+		}
+
+	});
+
 		logger.info('Updated player info for ' + interaction.user.tag + '.');
-	}
-	catch (error) {
-		logger.error(error);
-	}
-
-
-});
+	});
 
 // Login to Discord with your client's token
-client.login(config.token);
+client.login(config.testtoken);
