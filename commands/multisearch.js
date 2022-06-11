@@ -39,7 +39,7 @@ module.exports = {
                 .setDescription('asdfasdf')
                 .setRequired(true),
         )
-        .setDescription('asdfasdf',),
+        .setDescription('Copy in the champion select chat directly here to generate link to OP.GG multisearch function!',),
 
         async execute(interaction)
         {

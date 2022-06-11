@@ -46,7 +46,7 @@ module.exports = {
                 .addChoice('solo', 'Solo Queue')
                 .addChoice('flex', 'Flex Queue'),
         )
-        .setDescription('asdfasdf',),
+        .setDescription('Look up Solo and Flex Queue stats of a summoner',),
 
     async execute(interaction)
     {

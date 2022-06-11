@@ -17,7 +17,7 @@ module.exports = {
                 .setDescription('Enter the name of the summoner you would like to look up.')
                 .setRequired(true),
         )
-        .setDescription('asdfasdf',),
+        .setDescription('Look up TFT rank, win rate, and average rank of a summoner',),
     
 
     async execute(interaction)
