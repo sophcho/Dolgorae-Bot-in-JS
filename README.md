@@ -13,13 +13,17 @@ Dolgorae Bot is a discord bot written in JS ([previously in Python](https://gith
     - Each user can set their rank and position
     - View the sign up list
 
-
 ## Usage
 
+- Slash commands
 
 ![alt text](https://github.com/sophiayjcho/Dolgorae-Bot-in-JS/blob/main/pictures/slash_commands.png?raw=true)
 
+- Summoner search
+
 ![alt text](https://github.com/sophiayjcho/Dolgorae-Bot-in-JS/blob/main/pictures/tft_example.png?raw=true)
+
+- Inhouse lobby
 
 ![alt text](https://github.com/sophiayjcho/Dolgorae-Bot-in-JS/blob/main/pictures/inhouse_example.png?raw=true)
 
