@@ -1,6 +1,6 @@
 # Dolgorae
 
-Dolgorae Bot is a discord bot written in JS ([previously in Python](https://github.com/sophiayjcho/dolgorae-bot) until Discord.py announced they were no longer updating it) for League servers to use!
+Dolgorae Bot is a discord bot that uses Riot API to fetch data, written in JS, ([previously in Python](https://github.com/sophiayjcho/dolgorae-bot)) for League servers to use!
 
 ## Features
 
