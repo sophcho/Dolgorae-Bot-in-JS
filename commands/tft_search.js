@@ -2,9 +2,10 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageActionRow, MessageButton, MessageSelectMenu } = require('discord.js');
 const log4js = require('log4js');
 const logger = log4js.getLogger('log');
-const {devAPI, leagueVersion } = require('../config.json');
+const {leagueAPI, tftAPI, leagueVersion } = require('../config.json');
 const TeemoJS = require('teemojs');
-let api = TeemoJS(devAPI);
+let leagueapi = TeemoJS(leagueAPI);
+let tftapi = TeemoJS(tftAPI);
 const axios = require("axios");
 const cheerio = require("cheerio");
 
@@ -46,14 +47,16 @@ module.exports = {
         async function embed()
         {
             let result = await extract(name);
+            console.log(result);
             let iconURL, lolchessURL, summonerv4;
-            await api.get('na1', 'summoner.getBySummonerName', name)
+            await tftapi.get('na1', 'tftSummoner.getBySummonerName', name)
                 .then(data => { console.log(data); iconURL = 'http://ddragon.leagueoflegends.com/cdn/' + leagueVersion + '/img/profileicon/' + data.profileIconId + '.png';
                 lolchessURL = 'https://lolchess.gg/profile/na/' + data.name.replace(/ /g,'');
             summonerv4 = data;});
+
            
             let tft, embeds;
-            await api.get('na1', 'tftLeague.getLeagueEntriesForSummoner', summonerv4.id)
+            await tftapi.get('na1', 'tftLeague.getLeagueEntriesForSummoner', summonerv4.id)
                 .then(data => {
                                 console.log(data);
                                 tft = data;
@@ -76,18 +79,28 @@ module.exports = {
                                         "inline": false
                                     },
                                     {
+                                        "name": `Wins`,
+                                        "value": "```\n" + result[0] + "```" ,
+                                        "inline": true
+                                    },
+                                    {
                                         "name": `Top 4`,
-                                        "value": "```cs\n" + result[0] + "```" ,
+                                        "value": "```\n" +result[2] + "```",
                                         "inline": true
                                     },
                                     {
                                         "name": `Played`,
-                                        "value": "```cs\n" +result[4] + "```",
+                                        "value": "```\n" +result[4] + "```",
+                                        "inline": true
+                                    },
+                                    {
+                                        "name": `Win Rate`,
+                                        "value": "```yaml\n" +result[1] + "```",
                                         "inline": true
                                     },
                                     {
                                         "name": `Top 4 Rate`,
-                                        "value": "```css\n" +result[1] + "```",
+                                        "value": "```yaml\n" +result[3] + "```",
                                         "inline": true
                                     },
                                     {
@@ -95,6 +108,7 @@ module.exports = {
                                         "value": "```cs\n" +result[5] + "```",
                                         "inline": true
                                     }
+
 
                                 ],
                                 "thumbnail": {

@@ -2,9 +2,9 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageActionRow, MessageButton, MessageSelectMenu } = require('discord.js');
 const log4js = require('log4js');
 const logger = log4js.getLogger('log');
-const { riotAPI, leagueVersion } = require('../config.json');
+const { leagueAPI, leagueVersion } = require('../config.json');
 const { Kayn, REGIONS, KaynRequest } = require('kayn');
-const kayn = Kayn(riotAPI)({
+const kayn = Kayn( leagueAPI)({
     region: REGIONS.NORTH_AMERICA,
     apiURLPrefix: 'https://%s.api.riotgames.com',
     locale: 'en_US',
